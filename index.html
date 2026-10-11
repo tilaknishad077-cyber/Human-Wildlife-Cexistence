@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tadoba Wildlife Coexistence & Early Warning System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: linear-gradient(180deg, #f3f7f2 0%, #edf3e9 100%);
+      color: #1f2937;
+    }
+
+    .forest-bg {
+      background: linear-gradient(135deg, #173f29 0%, #235f3a 45%, #2d7a4a 100%);
+    }
+
+    .gold {
+      color: #d4af37;
+    }
+
+    .gold-bg {
+      background: linear-gradient(135deg, #d4af37 0%, #c79a1d 100%);
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(31,82,51,0.08);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(23, 63, 41, 0.12);
+    }
+
+    .sos-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: white;
+      box-shadow: 0 16px 30px rgba(239, 68, 68, 0.35);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 16px 30px rgba(239, 68, 68, 0.35); }
+      50% { transform: scale(1.03); box-shadow: 0 18px 40px rgba(239, 68, 68, 0.5); }
+    }
+
+    .status-badge {
+      background: linear-gradient(135deg, #e7f9ef 0%, #dff6e9 100%);
+      border: 1px solid #9ae6b4;
+      color: #146c43;
+    }
+
+    .radar-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+      border: 1px solid rgba(14, 116, 144, 0.15);
+    }
+
+    .warning-card {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .danger-card {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .safe-card {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .language-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: white;
+      transition: all 0.2s ease;
+    }
+
+    .language-btn.active {
+      background: linear-gradient(135deg, #d4af37 0%, #b68d12 100%);
+      color: #1f5233;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 9999px;
+      border: 2px solid rgba(239,68,68,0.4);
+      animation: ripple 2.4s infinite ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .mockmap {
+      background:
+        linear-gradient(rgba(31,82,51,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,82,51,0.08) 1px, transparent 1px),
+        radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.02) 40%, transparent 70%);
+      background-size: 28px 28px, 28px 28px, 100% 100%;
+      position: relative;
+    }
+
+    .pin {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #ef4444;
+      box-shadow: 0 0 0 8px rgba(239,68,68,0.15);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    .upload-box {
+      border: 2px dashed rgba(31,82,51,0.3);
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    .upload-box:hover {
+      border-color: rgba(31,82,51,0.7);
+      background: #f1f9f3;
+    }
+
+    .notification {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 1000;
+      max-width: 380px;
+      background: rgba(255,255,255,0.96);
+      border-left: 5px solid #16a34a;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      display: none;
+      animation: slideUp 0.35s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notification.show {
+      display: block;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 60;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(100%, 560px);
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input:focus {
+      border-color: #2d7a4a;
+      box-shadow: 0 0 0 3px rgba(45, 122, 74, 0.12);
+    }
+
+    .safe-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="forest-bg text-white sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="text-3xl">🛡️</div>
+          <div>
+            <h1 class="text-lg sm:text-2xl lg:text-3xl font-bold" id="mainTitle">Tadoba Wildlife Coexistence & Early Warning System</h1>
+            <p class="text-green-100 text-xs sm:text-sm" id="mainSubtitle">A community-first safety and alert platform</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="language-btn active rounded-lg px-3 py-2 text-sm" data-lang="en">EN</button>
+          <button class="language-btn rounded-lg px-3 py-2 text-sm" data-lang="hi">हिंदी</button>
+          <button class="language-btn rounded-lg px-3 py-2 text-sm" data-lang="mr">मराठी</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-backdrop show" id="registerModal">
+    <div class="modal-card">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800" id="regTitle">Register Contact</h2>
+          <p class="text-gray-500 text-sm" id="regDesc">Enable emergency notifications for your village cluster</p>
+        </div>
+        <button class="text-3xl text-gray-400 hover:text-gray-600" onclick="closeRegisterModal()">×</button>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 font-semibold mb-2" id="nameLabel">Name</label>
+        <input id="regName" type="text" class="input" placeholder="e.g. Sunil Patil" />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 font-semibold mb-2" id="phoneLabel">Phone Number</label>
+        <input id="regPhone" type="tel" class="input" maxlength="10" placeholder="9876543210" />
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-700 font-semibold mb-2" id="villageLabel">Village</label>
+        <input id="regVillage" type="text" class="input" placeholder="e.g. Kolsa" />
+      </div>
+
+      <button class="w-full gold-bg text-green-900 font-bold py-3 rounded-xl shadow-lg hover:opacity-95 transition" onclick="saveRegistration()">
+        <span id="saveBtnText">Save & Enable Alerts</span>
+      </button>
+
+      <div id="registerMessage" class="mt-4 hidden rounded-xl px-3 py-2 text-sm font-medium"></div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <section class="mb-10">
+      <div class="card p-6 sm:p-8 relative overflow-hidden">
+        <div class="absolute right-0 top-0 hidden sm:block">
+          <div class="pulse-ring"></div>
+        </div>
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div class="flex-1">
+            <div class="inline-flex items-center status-badge rounded-full px-3 py-1 text-sm font-semibold mb-4">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block mr-2"></span>
+              <span id="systemStatus">System active and monitoring</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2" id="alertHeading">Emergency SOS Alert System</h2>
+            <p class="text-gray-600 mb-6 max-w-xl" id="alertSubtext">Broadcast immediate safety warnings to nearby communities, forest officers, and local responders.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+                <div class="text-xs uppercase tracking-wide text-red-700 font-semibold" id="gpsLabel">GPS Status</div>
+                <div class="text-sm font-semibold text-red-800 mt-1">20.7526°N / 79.1633°E</div>
+              </div>
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <div class="text-xs uppercase tracking-wide text-amber-700 font-semibold" id="networkLabel">Network</div>
+                <div class="text-sm font-semibold text-amber-800 mt-1">Village Cluster 3 / Range 5</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center justify-center gap-4">
+            <button class="sos-btn rounded-2xl px-7 py-4 text-lg font-bold uppercase tracking-wide" id="sosBtn" onclick="triggerSOS()">
+              <i class="fas fa-bell mr-2"></i>
+              <span id="sosText">Send Emergency Alert</span>
+            </button>
+            <button class="bg-white border border-green-200 text-green-800 rounded-xl px-4 py-2 font-semibold shadow-sm hover:bg-green-50 transition" id="changeContactBtn" onclick="openRegisterModal()">
+              <i class="fas fa-user-edit mr-2"></i>
+              <span id="changeContactText">Update Contact</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900" id="alertListHeading">Registered Alert Recipients</h2>
+        <span class="bg-green-100 text-green-800 px-3 py-1 text-sm rounded-full font-semibold" id="recipientCount">0 registered</span>
+      </div>
+
+      <div id="recipientList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="card p-5 text-gray-500 text-center">No registered recipients yet.</div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-5" id="radarHeading">Wildlife Sightings & Danger Radar</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <div class="danger-card rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-red-700 font-semibold" id="highRiskLabel">High Risk</p>
+              <h3 class="text-xl font-bold text-red-800 mt-1" id="highRiskTitle">Tiger spotted</h3>
+            </div>
+            <div class="safe-icon bg-red-100 text-red-600"><i class="fas fa-exclamation-triangle"></i></div>
+          </div>
+          <p class="mt-3 text-red-800 font-semibold" id="dangerStatus">High Risk: Tiger spotted near Zone 3 border 25 mins ago</p>
+          <p class="mt-2 text-sm text-red-700" id="dangerDetail">Distance: 3.2 km from Kolsa Village</p>
+        </div>
+
+        <div class="warning-card rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-amber-700 font-semibold" id="mediumRiskLabel">Medium Risk</p>
+              <h3 class="text-xl font-bold text-amber-800 mt-1" id="mediumRiskTitle">Leopard track</h3>
+            </div>
+            <div class="safe-icon bg-amber-100 text-amber-600"><i class="fas fa-exclamation-circle"></i></div>
+          </div>
+          <p class="mt-3 text-amber-800 font-semibold" id="mediumStatus">Leopard activity near the grazing corridor</p>
+          <p class="mt-2 text-sm text-amber-700" id="mediumDetail">Distance: 5.4 km from Pandharkawda</p>
+        </div>
+
+        <div class="safe-card rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-emerald-700 font-semibold" id="safeLabel">Safe Zone</p>
+              <h3 class="text-xl font-bold text-emerald-800 mt-1" id="safeTitle">All clear</h3>
+            </div>
+            <div class="safe-icon bg-emerald-100 text-emerald-600"><i class="fas fa-shield-alt"></i></div>
+          </div>
+          <p class="mt-3 text-emerald-800 font-semibold" id="safeStatus">No recent sightings recorded in Zone 1</p>
+          <p class="mt-2 text-sm text-emerald-700" id="safeDetail">Monitoring stable for 3 hours</p>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-900" id="radarMapTitle">Radar Map</h3>
+          <div class="flex gap-2">
+            <button class="px-3 py-1.5 rounded-lg text-sm bg-green-100 text-green-700 font-semibold" id="allFilterBtn">All</button>
+            <button class="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-700 font-semibold" id="tigerFilterBtn">Tiger</button>
+            <button class="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-700 font-semibold" id="leopardFilterBtn">Leopard</button>
+            <button class="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-700 font-semibold" id="bearFilterBtn">Bear</button>
+          </div>
+        </div>
+
+        <div class="mockmap rounded-2xl h-72 md:h-80 relative overflow-hidden">
+          <div class="pin" style="left: 35%; top: 42%;"></div>
+          <div class="pin" style="left: 62%; top: 26%; background:#f59e0b; box-shadow: 0 0 0 8px rgba(245,158,11,0.16);"></div>
+          <div class="pin" style="left: 74%; top: 58%; background:#10b981; box-shadow: 0 0 0 8px rgba(16,185,129,0.18);"></div>
+
+          <div class="absolute left-5 top-5 bg-white rounded-xl px-3 py-2 shadow-lg text-sm font-semibold">
+            <div class="text-gray-500" id="zoneLabel">Zone 3</div>
+            <div class="text-red-600" id="zoneRisk">High Risk</div>
+          </div>
+
+          <div class="absolute right-5 bottom-5 bg-white rounded-xl px-3 py-2 shadow-lg text-sm">
+            <div class="text-gray-500" id="lastUpdatedLabel">Last updated</div>
+            <div class="font-semibold text-gray-800" id="lastUpdatedTime">2 mins ago</div>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <h4 class="font-bold text-gray-900 mb-3" id="sightingsHeading">Recent Sightings</h4>
+          <div id="sightingList" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-5" id="safetyGuideHeading">Safety Protocol Guide</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="card p-5">
+          <div class="safe-icon bg-red-100 text-red-600 mb-4">
+            <i class="fas fa-paw"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2" id="cardTigerTitle">What to do during a tiger encounter</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Stop and move backward slowly.</li>
+            <li>• Keep your face visible and avoid eye contact.</li>
+            <li>• Make yourself appear larger and call for help.</li>
+            <li>• Do not run or climb unstable structures.</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="safe-icon bg-amber-100 text-amber-600 mb-4">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2" id="cardGrazingTitle">Safe grazing times & perimeter caution</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Graze only between 6 AM and 4 PM.</li>
+            <li>• Stay away from the forest edge and dried shrubs.</li>
+            <li>• Use one designated watch point.</li>
+            <li>• Avoid lone grazing after sunset.</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="safe-icon bg-emerald-100 text-emerald-600 mb-4">
+            <i class="fas fa-home"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2" id="cardLivestockTitle">Securing livestock at night</h3>
+          <ul class="text-gray-600 space-y-2 text-sm">
+            <li>• Lock cattle in a sturdy enclosure by 6 PM.</li>
+            <li>• Keep bright lights and watchers near pens.</li>
+            <li>• Avoid leaving fodder outside overnight.</li>
+            <li>• Report unusual movements immediately.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-5" id="reportFormHeading">Community Incident Reporter</h2>
+
+      <div class="card p-6 sm:p-8">
+        <form id="incidentForm" onsubmit="handleIncidentSubmit(event)">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label class="block font-semibold text-gray-700 mb-2" id="reporterNameLabel">Reporter Name</label>
+              <input type="text" class="input" id="reporterNameInput" placeholder="e.g. Neha Shinde" required />
+            </div>
+
+            <div>
+              <label class="block font-semibold text-gray-700 mb-2" id="reporterVillageLabel">Village / Area</label>
+              <input type="text" class="input" id="reporterVillageInput" placeholder="e.g. Kolsa" required />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label class="block font-semibold text-gray-700 mb-2" id="incidentTypeLabel">Incident Type</label>
+              <select id="incidentType" class="input" required>
+                <option value="">Select incident</option>
+                <option value="Animal Sighting">Animal Sighting</option>
+                <option value="Footprints">Footprints</option>
+                <option value="Crop Damage">Crop Damage</option>
+                <option value="Livestock Concern">Livestock Concern</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-gray-700 mb-2" id="locationLabel">Location Pick</label>
+              <select id="locationPick" class="input" required>
+                <option value="">Choose location</option>
+                <option value="Zone 1">Zone 1</option>
+                <option value="Zone 2">Zone 2</option>
+                <option value="Zone 3">Zone 3</option>
+                <option value="Forest Edge">Forest Edge</option>
+                <option value="Grazing Ground">Grazing Ground</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2">Evidence / Photo</label>
+            <div class="upload-box rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer" onclick="document.getElementById('photoInput').click()">
+              <i class="fas fa-camera text-3xl text-green-700 mb-3"></i>
+              <p class="text-gray-700 font-medium" id="uploadText">Upload a reference image or photo</p>
+              <p class="text-xs text-gray-500 mt-1" id="uploadHint">PNG, JPG, or JPEG</p>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="previewPhoto(event)" />
+            <div id="photoPreview" class="mt-4 hidden">
+              <img id="previewImg" class="w-full max-w-xs rounded-2xl border border-gray-200 shadow-sm" alt="report preview" />
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <label class="block font-semibold text-gray-700 mb-2" id="detailsLabel">Description</label>
+            <textarea id="incidentDetails" rows="4" class="input" placeholder="Describe the issue, what was seen, and where." required></textarea>
+          </div>
+
+          <button type="submit" class="w-full gold-bg text-green-900 py-3 rounded-xl font-bold shadow-lg hover:opacity-95 transition">
+            <i class="fas fa-paper-plane mr-2"></i>
+            <span id="submitIncidentText">Submit Incident Report</span>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="forest-bg text-white mt-10">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="font-bold text-lg mb-3" id="footerTitle1">Emergency Contacts</h3>
+          <ul class="text-green-100 text-sm space-y-2">
+            <li><i class="fas fa-phone-alt mr-2"></i>Forest Dept: 1800-123-456</li>
+            <li><i class="fas fa-phone-alt mr-2"></i>Police: 112</li>
+            <li><i class="fas fa-phone-alt mr-2"></i>Ambulance: 108</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg mb-3" id="footerTitle2">Useful Links</h3>
+          <ul class="text-green-100 text-sm space-y-2">
+            <li><i class="fas fa-link mr-2"></i>Tadoba Conservation Portal</li>
+            <li><i class="fas fa-link mr-2"></i>Village Safety Checklist</li>
+            <li><i class="fas fa-link mr-2"></i>Forest Officer Hotline</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-lg mb-3" id="footerTitle3">Community Safety</h3>
+          <ul class="text-green-100 text-sm space-y-2">
+            <li><i class="fas fa-leaf mr-2"></i>Wildlife coexistence programs</li>
+            <li><i class="fas fa-shield-alt mr-2"></i>Early warning support</li>
+            <li><i class="fas fa-heart mr-2"></i>Protecting people and wildlife</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 border-t border-white/20 pt-5 text-center text-sm text-green-100">
+        © 2026 Tadoba Wildlife Coexistence & Early Warning System
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="notification" role="alert"></div>
+
+  <script>
+    const translations = {
+      en: {
+        mainTitle: "Tadoba Wildlife Coexistence & Early Warning System",
+        mainSubtitle: "A community-first safety and alert platform",
+        systemStatus: "System active and monitoring",
+        alertHeading: "Emergency SOS Alert System",
+        alertSubtext: "Broadcast immediate safety warnings to nearby communities, forest officers, and local responders.",
+        gpsLabel: "GPS Status",
+        networkLabel: "Network",
+        sosText: "Send Emergency Alert",
+        changeContactText: "Update Contact",
+        alertListHeading: "Registered Alert Recipients",
+        radarHeading: "Wildlife Sightings & Danger Radar",
+        highRiskLabel: "High Risk",
+        highRiskTitle: "Tiger spotted",
+        dangerStatus: "High Risk: Tiger spotted near Zone 3 border 25 mins ago",
+        dangerDetail: "Distance: 3.2 km from Kolsa Village",
+        mediumRiskLabel: "Medium Risk",
+        mediumRiskTitle: "Leopard track",
+        mediumStatus: "Leopard activity near the grazing corridor",
+        mediumDetail: "Distance: 5.4 km from Pandharkawda",
+        safeLabel: "Safe Zone",
+        safeTitle: "All clear",
+        safeStatus: "No recent sightings recorded in Zone 1",
+        safeDetail: "Monitoring stable for 3 hours",
+        radarMapTitle: "Radar Map",
+        zoneLabel: "Zone 3",
+        zoneRisk: "High Risk",
+        lastUpdatedLabel: "Last updated",
+        lastUpdatedTime: "2 mins ago",
+        sightingsHeading: "Recent Sightings",
+        safetyGuideHeading: "Safety Protocol Guide",
+        cardTigerTitle: "What to do during a tiger encounter",
+        cardGrazingTitle: "Safe grazing times & perimeter caution",
+        cardLivestockTitle: "Securing livestock at night",
+        reportFormHeading: "Community Incident Reporter",
+        reporterNameLabel: "Reporter Name",
+        reporterVillageLabel: "Village / Area",
+        incidentTypeLabel: "Incident Type",
+        locationLabel: "Location Pick",
+        detailsLabel: "Description",
+        uploadText: "Upload a reference image or photo",
+        uploadHint: "PNG, JPG, or JPEG",
+        submitIncidentText: "Submit Incident Report",
+        footerTitle1: "Emergency Contacts",
+        footerTitle2: "Useful Links",
+        footerTitle3: "Community Safety",
+        regTitle: "Register Contact",
+        regDesc: "Enable emergency notifications for your village cluster",
+        nameLabel: "Name",
+        phoneLabel: "Phone Number",
+        villageLabel: "Village",
+        saveBtnText: "Save & Enable Alerts",
+        changeContactBtn: "Update Contact",
+        systemStatusText: "System active and monitoring"
+      },
+      hi: {
+        mainTitle: "तडोबा वन्यजीव सहअस्तित्व और प्रारंभिक चेतावनी प्रणाली",
+        mainSubtitle: "सामुदायिक सुरक्षा और अलर्ट प्लेटफ़ॉर्म",
+        systemStatus: "सिस्टम सक्रिय और निगरानी में",
+        alertHeading: "आपातकालीन SOS अलर्ट सिस्टम",
+        alertSubtext: "पास के समुदायों, वन विभाग अधिकारियों और स्थानीय प्रतिक्रिया दलों को तत्काल सुरक्षित चेतावनियाँ भेजें।",
+        gpsLabel: "जीपीएस स्थिति",
+        networkLabel: "नेटवर्क",
+        sosText: "आपातकालीन अलर्ट भेजें",
+        changeContactText: "संपर्क अपडेट करें",
+        alertListHeading: "पंजीकृत अलर्ट रिसीपियंट्स",
+        radarHeading: "वन्यजीव दृश्य और खतरा रडार",
+        highRiskLabel: "उच्च जोखिम",
+        highRiskTitle: "बाघ देखा गया",
+        dangerStatus: "उच्च जोखिम: ज़ोन 3 सीमा के पास बाघ 25 मिनट पहले देखा गया",
+        dangerDetail: "दूरी: कोलसा गाँव से 3.2 किमी",
+        mediumRiskLabel: "मध्यम जोखिम",
+        mediumRiskTitle: "तेहड़ का निशान",
+        mediumStatus: "चारागाह गलियारे के पास तेंदुए की गतिविधि",
+        mediumDetail: "दूरी: पंढरकवाड़ से 5.4 किमी",
+        safeLabel: "सुरक्षित क्षेत्र",
+        safeTitle: "सब ठीक",
+        safeStatus: "जोन 1 में हाल की कोई सूचना नहीं",
+        safeDetail: "3 घंटों से निगरानी स्थिर",
+        radarMapTitle: "रडार नक्शा",
+        zoneLabel: "जोन 3",
+        zoneRisk: "उच्च जोखिम",
+        lastUpdatedLabel: "अंतिम अपडेट",
+        lastUpdatedTime: "2 मिनट पहले",
+        sightingsHeading: "हाल की रिपोर्टें",
+        safetyGuideHeading: "सुरक्षा प्रोटोकॉल गाइड",
+        cardTigerTitle: "बाघ के मिलने पर क्या करें",
+        cardGrazingTitle: "सुरक्षित चराई का समय और सीमा चेतावनी",
+        cardLivestockTitle: "रात में पशुधन सुरक्षित करना",
+        reportFormHeading: "सामुदायिक घटना रिपोर्टर",
+        reporterNameLabel: "रिपोर्टर का नाम",
+        reporterVillageLabel: "गाँव / क्षेत्र",
+        incidentTypeLabel: "घटना का प्रकार",
+        locationLabel: "स्थान चुनें",
+        detailsLabel: "विवरण",
+        uploadText: "संदर्भ छवि या फोटो अपलोड करें",
+        uploadHint: "PNG, JPG, या JPEG",
+        submitIncidentText: "घटना रिपोर्ट जमा करें",
+        footerTitle1: "आपातकालीन संपर्क",
+        footerTitle2: "उपयोगी लिंक",
+        footerTitle3: "सामुदायिक सुरक्षा",
+        regTitle: "संपर्क दर्ज करें",
+        regDesc: "अपने गाँव क्लस्टर के लिए आपातकालीन सूचनाएँ सक्षम करें",
+        nameLabel: "नाम",
+        phoneLabel: "फोन नंबर",
+        villageLabel: "गाँव",
+        saveBtnText: "सहेजें और अलर्ट सक्षम करें",
+        changeContactBtn: "संपर्क अपडेट करें",
+        systemStatusText: "सिस्टम सक्रिय और निगरानी में"
+      },
+      mr: {
+        mainTitle: "तडोबा वन्यजीव सहअस्तित्व आणि प्रारंभिक चेतावणी प्रणाली",
+        mainSubtitle: "सामुदायिक सुरक्षेचे आणि अलर्टचे प्लॅटफॉर्म",
+        systemStatus: "सिस्टम सक्रिय आणि निरीक्षणात",
+        alertHeading: "आपत्कालीन SOS अलर्ट सिस्टम",
+        alertSubtext: "जवळच्या समुदायांना, वन अधिकाऱ्यांना आणि स्थानिक प्रतिसाद पथकांना त्वरित सुरक्षा चेतावणी पाठवा.",
+        gpsLabel: "जीपीएस स्थिती",
+        networkLabel: "नेटवर्क",
+        sosText: "आपत्कालीन अलर्ट पाठवा",
+        changeContactText: "संपर्क अपडेट करा",
+        alertListHeading: "नोंदणीकृत अलर्ट प्राप्तकर्ते",
+        radarHeading: "वन्यजीव दृश्ये आणि धोका रडार",
+        highRiskLabel: "उच्च जोखीम",
+        highRiskTitle: "वाघ दिसला",
+        dangerStatus: "उच्च जोखीम: झोन 3 सीमेजवळ वाघ 25 मिनिटांपूर्वी दिसला",
+        dangerDetail: "अंतर: कोलसा गावापासून 3.2 किमी",
+        mediumRiskLabel: "मध्यम जोखीम",
+        mediumRiskTitle: "तेंदुएचे पादचिन्ह",
+        mediumStatus: "गहाण क्षेत्राजवळ तेंदुएची हालचाल",
+        mediumDetail: "अंतर: पंढरकवाडापासून 5.4 किमी",
+        safeLabel: "सुरक्षित क्षेत्र",
+        safeTitle: "सर्व ठीक",
+        safeStatus: "झोन 1 मध्ये अलीकडील दृश्ये नाहीत",
+        safeDetail: "3 तासांपासून निरीक्षण स्थिर",
+        radarMapTitle: "रडार नकाशा",
+        zoneLabel: "झोन 3",
+        zoneRisk: "उच्च जोखीम",
+        lastUpdatedLabel: "अंतिम अपडेट",
+        lastUpdatedTime: "2 मिनिटांपूर्वी",
+        sightingsHeading: "अलीकडील दृश्ये",
+        safetyGuideHeading: "सुरक्षा प्रोटोकॉल गाइड",
+        cardTigerTitle: "वाघ समोर आल्यावर काय करावे",
+        cardGrazingTitle: "सुरक्षित चराईचे वेळ आणि सीमा सावधगिरी",
+        cardLivestockTitle: "रात्रभर पाळीव प्राणी सुरक्षित ठेवणे",
+        reportFormHeading: "सामुदायिक घटना रिपोर्टर",
+        reporterNameLabel: "रिपोर्टरचे नाव",
+        reporterVillageLabel: "गाव / क्षेत्र",
+        incidentTypeLabel: "घटना प्रकार",
+        locationLabel: "स्थान निवडा",
+        detailsLabel: "वर्णन",
+        uploadText: "संदर्भ प्रतिमा किंवा फोटो अपलोड करा",
+        uploadHint: "PNG, JPG, किंवा JPEG",
+        submitIncidentText: "घटना अहवाल सबमिट करा",
+        footerTitle1: "आपत्कालीन संपर्क",
+        footerTitle2: "उपयुक्त दुवे",
+        footerTitle3: "सामुदायिक सुरक्षा",
+        regTitle: "संपर्क नोंदणी करा",
+        regDesc: "आपल्या गावाच्या क्लस्टरसाठी आपत्कालीन सूचना सक्षम करा",
+        nameLabel: "नाव",
+        phoneLabel: "फोन क्रमांक",
+        villageLabel: "गाव",
+        saveBtnText: "सेव्ह करा आणि अलर्ट सक्षम करा",
+        changeContactBtn: "संपर्क अपडेट करा",
+        systemStatusText: "सिस्टम सक्रिय आणि निरीक्षणात"
+      }
+    };
+
+    const sightings = [
+      { type: 'Tiger', time: '25 mins ago', distance: '3.2 km', zone: 'Zone 3', color: 'red' },
+      { type: 'Leopard', time: '1 hr ago', distance: '5.4 km', zone: 'Zone 2', color: 'amber' },
+      { type: 'Sloth Bear', time: '2 hrs ago', distance: '7.1 km', zone: 'Forest Edge', color: 'green' },
+      { type: 'Tiger', time: '4 hrs ago', distance: '9.8 km', zone: 'Zone 1', color: 'red' }
+    ];
+
+    let recipients = JSON.parse(localStorage.getItem('tadobaRecipients') || '[]');
+    let currentLang = 'en';
+
+    function renderRecipients() {
+      const recipientList = document.getElementById('recipientList');
+      const count = document.getElementById('recipientCount');
+
+      if (recipients.length === 0) {
+        recipientList.innerHTML = '<div class=\"card p-5 text-gray-500 text-center\">No registered recipients yet.</div>';
+        count.textContent = '0 registered';
+        return;
+      }
+
+      count.textContent = `${recipients.length} registered`;
+      recipientList.innerHTML = recipients.map((person, index) => `
+        <div class="card p-5">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">${person.name}</h3>
+              <p class="text-sm text-gray-600">${person.village}</p>
+            </div>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">Active</span>
+          </div>
+          <div class="text-sm text-gray-600 mb-3">
+            <i class="fas fa-phone mr-2 text-green-700"></i>${person.phone}
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-200" onclick="editRecipient(${index})">Edit</button>
+            <button class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-200" onclick="deleteRecipient(${index})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openRegisterModal() {
+      document.getElementById('registerModal').classList.add('show');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('show');
+      document.getElementById('registerMessage').classList.add('hidden');
+    }
+
+    function saveRegistration() {
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const village = document.getElementById('regVillage').value.trim();
+      const messageBox = document.getElementById('registerMessage');
+
+      if (!name || !phone || !village) {
+        messageBox.textContent = 'Please fill in all fields.';
+        messageBox.className = 'mt-4 rounded-xl px-3 py-2 text-sm font-medium bg-red-100 text-red-700';
+        messageBox.classList.remove('hidden');
+        return;
+      }
+
+      if (!/^\d{10}$/.test(phone)) {
+        messageBox.textContent = 'Phone number must be exactly 10 digits.';
+        messageBox.className = 'mt-4 rounded-xl px-3 py-2 text-sm font-medium bg-red-100 text-red-700';
+        messageBox.classList.remove('hidden');
+        return;
+      }
+
+      const existingIndex = recipients.findIndex(item => item.phone === phone);
+      if (existingIndex !== -1) {
+        recipients[existingIndex] = { name, phone, village };
+      } else {
+        recipients.push({ name, phone, village });
+      }
+
+      localStorage.setItem('tadobaRecipients', JSON.stringify(recipients));
+      renderRecipients();
+      messageBox.textContent = 'Registration saved successfully.';
+      messageBox.className = 'mt-4 rounded-xl px-3 py-2 text-sm font-medium bg-green-100 text-green-700';
+      messageBox.classList.remove('hidden');
+
+      document.getElementById('regName').value = '';
+      document.getElementById('regPhone').value = '';
+      document.getElementById('regVillage').value = '';
+
+      setTimeout(() => {
+        closeRegisterModal();
+      }, 1000);
+    }
+
+    function editRecipient(index) {
+      const person = recipients[index];
+      document.getElementById('regName').value = person.name;
+      document.getElementById('regPhone').value = person.phone;
+      document.getElementById('regVillage').value = person.village;
+      recipients.splice(index, 1);
+      localStorage.setItem('tadobaRecipients', JSON.stringify(recipients));
+      renderRecipients();
+      openRegisterModal();
+    }
+
+    function deleteRecipient(index) {
+      recipients.splice(index, 1);
+      localStorage.setItem('tadobaRecipients', JSON.stringify(recipients));
+      renderRecipients();
+    }
+
+    function triggerSOS() {
+      const button = document.getElementById('sosBtn');
+      button.disabled = true;
+      button.innerHTML = '<i class=\"fas fa-spinner fa-spin mr-2\"></i> Sending...';
+
+      setTimeout(() => {
+        button.disabled = false;
+        button.innerHTML = '<i class=\"fas fa-bell mr-2\"></i> <span id=\"sosText\">Send Emergency Alert</span>';
+
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="text-2xl">🚨</div>
+            <div>
+              <div class="font-bold text-gray-900 mb-1">Emergency Alert Sent</div>
+              <div class="text-sm text-gray-600">Tiger sighting report broadcast to nearby villagers and forest officers.</div>
+            </div>
+          </div>
+        `;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3200);
+      }, 1200);
+
+      if (recipients.length > 0) {
+        recipients.forEach((person) => {
+          console.log(`Sending alert to ${person.name} (${person.phone}) – tiger spotted near Zone 3`);
+        });
+      }
+    }
+
+    function renderSightings(filter = 'all') {
+      const list = document.getElementById('sightingList');
+
+      const filtered = filter === 'all'
+        ? sightings
+        : sightings.filter(item => item.type.toLowerCase() === filter);
+
+      list.innerHTML = filtered.map(item => `
+        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center
+              ${item.color === 'red' ? 'bg-red-100 text-red-600' :
+                item.color === 'amber' ? 'bg-amber-100 text-amber-600' :
+                'bg-emerald-100 text-emerald-600'}">
+              ${item.type === 'Tiger' ? '🐯' : item.type === 'Leopard' ? '🐆' : '🐻'}
+            </div>
+            <div>
+              <div class="font-bold text-gray-900">${item.type}</div>
+              <div class="text-sm text-gray-500">${item.zone} • ${item.time}</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-700">${item.distance}</div>
+        </div>
+      `).join('');
+    }
+
+    function previewPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('photoPreview').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleIncidentSubmit(event) {
+      event.preventDefault();
+
+      const report = {
+        name: document.getElementById('reporterNameInput').value.trim(),
+        village: document.getElementById('reporterVillageInput').value.trim(),
+        type: document.getElementById('incidentType').value,
+        location: document.getElementById('locationPick').value,
+        details: document.getElementById('incidentDetails').value.trim()
+      };
+
+      if (!report.name || !report.village || !report.type || !report.location || !report.details) {
+        showToast('Please complete all incident fields.', 'error');
+        return;
+      }
+
+      showToast('Incident reported successfully. Community alerts have been logged.', 'success');
+
+      document.getElementById('incidentForm').reset();
+      document.getElementById('photoPreview').classList.add('hidden');
+      document.getElementById('previewImg').src = '';
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="text-2xl">${type === 'success' ? '✅' : '⚠️'}</div>
+          <div class="text-sm font-medium ${type === 'success' ? 'text-green-700' : 'text-red-700'}">${message}</div>
+        </div>
+      `;
+      toast.style.borderLeftColor = type === 'success' ? '#16a34a' : '#ef4444';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.language-btn').forEach(button => {
+        button.classList.toggle('active', button.dataset.lang === lang);
+      });
+
+      const strings = translations[lang];
+      Object.entries(strings).forEach(([key, value]) => {
+        const element = document.getElementById(key);
+        if (element) element.textContent = value;
+      });
+
+      document.getElementById('mainTitle').textContent = strings.mainTitle;
+      document.getElementById('mainSubtitle').textContent = strings.mainSubtitle;
+      document.getElementById('systemStatus').textContent = strings.systemStatus;
+      document.getElementById('alertHeading').textContent = strings.alertHeading;
+      document.getElementById('alertSubtext').textContent = strings.alertSubtext;
+      document.getElementById('sosText').textContent = strings.sosText;
+      document.getElementById('changeContactText').textContent = strings.changeContactText;
+      document.getElementById('alertListHeading').textContent = strings.alertListHeading;
+      document.getElementById('radarHeading').textContent = strings.radarHeading;
+      document.getElementById('sightingsHeading').textContent = strings.sightingsHeading;
+      document.getElementById('safetyGuideHeading').textContent = strings.safetyGuideHeading;
+      document.getElementById('reportFormHeading').textContent = strings.reportFormHeading;
+      document.getElementById('submitIncidentText').textContent = strings.submitIncidentText;
+      document.getElementById('uploadText').textContent = strings.uploadText;
+      document.getElementById('uploadHint').textContent = strings.uploadHint;
+      document.getElementById('regTitle').textContent = strings.regTitle;
+      document.getElementById('regDesc').textContent = strings.regDesc;
+      document.getElementById('nameLabel').textContent = strings.nameLabel;
+      document.getElementById('phoneLabel').textContent = strings.phoneLabel;
+      document.getElementById('villageLabel').textContent = strings.villageLabel;
+      document.getElementById('saveBtnText').textContent = strings.saveBtnText;
+      document.getElementById('changeContactBtn').textContent = strings.changeContactText;
+    }
+
+    document.querySelectorAll('.language-btn').forEach(button => {
+      button.addEventListener('click', () => applyLanguage(button.dataset.lang));
+    });
+
+    document.getElementById('allFilterBtn').addEventListener('click', () => {
+      renderSightings('all');
+      setFilterButtons('all');
+    });
+
+    document.getElementById('tigerFilterBtn').addEventListener('click', () => {
+      renderSightings('tiger');
+      setFilterButtons('tiger');
+    });
+
+    document.getElementById('leopardFilterBtn').addEventListener('click', () => {
+      renderSightings('leopard');
+      setFilterButtons('leopard');
+    });
+
+    document.getElementById('bearFilterBtn').addEventListener('click', () => {
+      renderSightings('sloth bear');
+      setFilterButtons('bear');
+    });
+
+    function setFilterButtons(active) {
+      const buttons = {
+        all: document.getElementById('allFilterBtn'),
+        tiger: document.getElementById('tigerFilterBtn'),
+        leopard: document.getElementById('leopardFilterBtn'),
+        bear: document.getElementById('bearFilterBtn')
+      };
+
+      Object.entries(buttons).forEach(([key, btn]) => {
+        btn.className = `px-3 py-1.5 rounded-lg text-sm font-semibold ${key === active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`;
+      });
+    }
+
+    window.onload = function () {
+      renderRecipients();
+      renderSightings('all');
+      setFilterButtons('all');
+      applyLanguage('en');
+
+      if (Notification && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+    };
+  </script>
+</body>
+</html>
